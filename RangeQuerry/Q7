@@ -1,0 +1,18 @@
+#include<bits/stdc++.h>
+using namespace std;
+const int mx = 2e5+7;
+typedef long long lli;
+
+int main() {
+     int n,q,l,r,x1,x2,y1,y2; cin>>n>>q;
+     vector<vector<int>> dp(n+1,vector<int>(n+1));
+     char ch; int b[n][n];
+     for(int i=0;i<n;i++)for(int j=0;j<n;j++){
+         cin>>ch; if(ch == '*')b[i][j] = 1; else b[i][j] = 0;
+         dp[i+1][j+1] = dp[i+1][j] + dp[i][j+1] - dp[i][j] + b[i][j];
+     }
+     while(q--){
+         cin>>x1>>y1>>x2>>y2;
+         cout<<dp[x2][y2]-dp[x2][y1-1]-dp[x1-1][y2] + dp[x1-1][y1-1]<<"\n";
+     }
+}
