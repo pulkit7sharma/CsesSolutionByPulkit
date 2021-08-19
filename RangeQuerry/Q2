@@ -1,0 +1,25 @@
+/*
+I have use sparse table which solves every querry in O(1)......
+*/
+#include<bits/stdc++.h>
+using namespace std;
+const int mx = 2e5+7;
+typedef long long lli;
+vector<int> a(mx);
+int main() {
+     int n,q,l,r; cin>>n>>q;
+     for(int i=0;i<n;i++){cin>>a[i];}
+     int lg = (int)log2(n)+1;
+     vector<vector<int>> dp(lg , vector<int>(n));
+     dp[0] = a;
+     for(int i = 1; i < lg; i++){
+         for(int j = 0 ; j+(1<<i) <= n ; j++){
+             dp[i][j] =  min(dp[i-1][j] , dp[i-1][j+(1<<(i-1))]);
+         }
+     }
+     while(q--){
+         cin>>l>>r; l--,r--;
+         int ln = (int)log2(r-l+1);
+         cout<<min(dp[ln][l],dp[ln][r-(1<<ln)+1])<<"\n";
+     }
+}
