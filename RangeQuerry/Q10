@@ -1,0 +1,60 @@
+/*
+Bit with compression technique....
+*/
+#include<bits/stdc++.h>
+using namespace std;
+const int mx = 2e5+7;
+typedef long long lli;
+lli a[mx];
+lli bit[5*mx+1];
+void upd(int i,int v){
+    while(i <= 5*mx){
+        bit[i] += v;
+        i += i&-i;
+    }
+}
+ 
+lli get(int i){
+    lli sum = 0;
+    while(i > 0){
+        sum += bit[i];
+        i -= i &-i;
+    }
+    return sum;
+}
+int main() {
+     int n,q,l,r; 
+     char c;
+     cin>>n>>q;
+     vector<int> b,a(n);
+     for(int i=0;i<n;i++){
+         cin>>a[i];b.push_back(a[i]);
+     }
+     vector<vector<int>> Querry;
+     for(int i = 0; i  < q; i++){
+         cin>>c>>l>>r;
+         Querry.push_back({c=='?',l,r});
+         if(c == '!')b.push_back(r);
+     }
+     sort(b.begin(),b.end());
+     for(int i=0;i<n;i++){
+         int j = upper_bound(b.begin(),b.end(),a[i])-b.begin()+1;
+         upd(j,1);
+     }
+     for(int i=0;i<q;i++){
+         l = Querry[i][1], r = Querry[i][2];
+         if(Querry[i][0] == 1){
+             l = upper_bound(b.begin(),b.end(),l-1)-b.begin()+1;
+             r = upper_bound(b.begin(),b.end(),r)-b.begin()+1;
+              cout<<get(r)-get(l)<<"\n";
+         }
+         else{
+             l--;
+             int j = upper_bound(b.begin(),b.end(),a[l])-b.begin()+1;
+             upd(j,-1);
+             a[l] = r;
+             j = upper_bound(b.begin(),b.end(),a[l])-b.begin()+1;
+             upd(j,1);
+         }
+     }
+}
