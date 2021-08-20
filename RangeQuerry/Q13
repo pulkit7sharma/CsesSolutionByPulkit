@@ -1,0 +1,73 @@
+
+/*
+
+In each node of the segment tree that stores information about the range
+$[l, r]$ we store the following information:
+The maximum subarray sum in the range $[l, r]$. (Let this be $G$)
+The maximum subarray sum in the range $[l, r]$ if it must contain $a_l$. (Let
+this be $L$)
+The maximum subarray sum in the range $[l, r]$ if it must contain $a_r$. (Let
+this be $R$)
+The total sum of the range. (Let this be $S$)
+
+When we combine two nodes $u$ (left child) and $v$ (right child) to make node
+$w$,
+$w.G = \max(u.G, v.G, u.R + v.L)$
+$w.L = \max(u.L, u.S + v.L)$
+$w.R = \max(u.R + v.S, v.R)$
+$w.S = u.S + v.S$
+
+*/
+
+
+#include<bits/stdc++.h>
+using namespace std;
+const int mx = 2e5+7;
+typedef long long lli;
+lli a[mx];
+struct node{
+    lli l,r,sum,ans;
+    node operator+(node b){
+        return {
+            max(sum+b.l,l),
+            max(r+b.sum,b.r),
+            b.sum+sum,
+            max({ans,b.ans,r+b.l})
+        };
+    }
+};
+node st[4*mx];
+void build(int ss,int se,int si){
+    if(ss==se){
+        st[si] = {max(0ll,a[ss]),max(0ll,a[ss]),a[ss],max(0ll,a[ss])};
+        return;
+    }
+    int mid = (ss+se)/2;
+    build(ss,mid,2*si+1);
+    build(mid+1,se,2*si+2);
+    st[si]=st[2*si+1]+st[2*si+2];
+}
+void upd(int ss,int se,int si,int idx,lli val){
+     if(ss==se){
+        st[si] = {max(0ll,val),max(0ll,val),val,max(0ll,val)};
+        return;
+    }
+    int mid = (ss+se)/2;
+    if(idx>=ss && idx <= mid)
+    upd(ss,mid,2*si+1,idx,val);
+    else
+    upd(mid+1,se,2*si+2,idx,val);
+    st[si]=st[2*si+1]+st[2*si+2];
+}
+int main() {
+     int n,q,l,r,x; cin>>n>>q;
+     for(int i=0;i<n;i++){cin>>a[i];}
+     build(0,n-1,0);  
+     while(q--){
+         cin>>x>>r;
+         x--;
+         a[x]=r;
+         upd(0,n-1,0,x,r);
+         cout<<st[0].ans<<"\n";
+     }
+}
