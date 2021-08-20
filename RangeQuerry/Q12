@@ -1,0 +1,74 @@
+/*
+min of a[idx] + idx on right side of i 
+and min of a[idx] - idx on left side of i.
+
+p[a] + a-b if a >= b order a pizza from right side
+pa[a] + b-a if a <= b order a pizza from left side
+
+use segment tree where node  will store min of pa[a]+a , pa[a]-a for particular range
+*/
+
+#include<bits/stdc++.h>
+using namespace std;
+const int mx = 2e5+7;
+typedef long long lli;
+lli a[mx];
+lli st[4*mx],st1[4*mx];
+void build(int ss,int se,int si){
+    if(ss==se){
+         st[si]=a[ss]+ss;
+         st1[si]=a[ss]-ss;
+         return;
+    }
+    int mid = (ss+se)/2;
+    build(ss,mid,2*si+1);
+    build(mid+1,se,2*si+2);
+    st[si]=min(st[2*si+1],st[2*si+2]);
+    st1[si]=min(st1[2*si+1] , st1[2*si+2]);
+}
+void upd(int ss,int se,int si,int idx){
+    if(ss==se){
+         st[si] = a[idx]+idx;
+         st1[si] = a[idx]-idx;
+         return;
+    }
+    int mid = (ss+se)/2;
+    if(idx>=ss && idx<=mid)
+    upd(ss,mid,2*si+1,idx);
+    else
+    upd(mid+1,se,2*si+2,idx);
+    st[si] =min(st[2*si+1],st[2*si+2]);
+    st1[si]=min(st1[2*si+1],st1[2*si+2]);
+}
+int get(int ss,int se,int si,int qs,int qe){
+    if(qs>se || qe < ss)return 1e9;
+    if(qs<=ss && qe >= se)return st[si];
+    int mid = (ss+se)/2;
+    return min(get(ss,mid,2*si+1,qs,qe),get(mid+1,se,2*si+2,qs,qe)); 
+}
+int getl(int ss,int se,int si,int qs,int qe){
+    if(qs>se || qe < ss)return 1e9;
+    if(qs<=ss && qe >= se)return st1[si];
+    int mid = (ss+se)/2;
+    return min(getl(ss,mid,2*si+1,qs,qe),getl(mid+1,se,2*si+2,qs,qe)); 
+}
+int main() {
+     int n,q,l,r,x; cin>>n>>q;
+     for(int i=1;i<=n;i++){cin>>a[i];}
+     for(int i=0;i<4*mx;i++){st[i]=1e9;st1[i]=1e9;}
+     build(1,n,1);
+     while(q--){
+         cin>>x;
+         if(x==2){
+         cin>>l;
+         lli mx1 = get(1,n,1,l+1,n);
+         lli mx2 = getl(1,n,1,1,l-1);
+         cout<<min( {mx1-l , l+mx2 , a[l] })<<"\n";   
+         }
+         else{
+             cin>>l>>r;
+             a[l]=r;
+             upd(1,n,1,l);
+         }
+     }
+}
