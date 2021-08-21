@@ -1,0 +1,63 @@
+/*
+ Two dimensional binary indexed tree......
+  hint:   bit[4][5] stores sum of first 4 elements in column 5;
+ */
+
+
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long int lli;
+const int mx = 1001;
+int bit[mx][mx] , a[mx][mx];
+void upd(int i,int j,int v){
+     int ni = i , nj = j;
+     while(ni < mx){
+         nj  = j;
+         while(nj < mx){
+             bit[ni][nj]+=v;
+             nj += nj&-nj;
+         }
+         ni += ni&-ni;
+     }
+}
+int get(int i,int j){
+    int ni=i,nj=j;
+    int sum = 0;
+    while(ni > 0){
+        nj = j;
+        while(nj > 0){
+            sum += bit[ni][nj];
+            nj -= nj&-nj;
+        }
+        ni -= ni&-ni;
+    }
+    return sum;
+}
+int main(){
+     int n,q,x1,x,x2,y1,y2; char c;  cin>>n>>q;
+     for(int i=1;i<=n;i++){
+         for(int j=1;j<=n;j++){
+             cin>>c; a[i][j] = (c=='*');
+             upd(i,j,a[i][j]);
+         }
+     }
+     while(q--){
+         cin>>x;
+         if(x == 1){
+             cin>>x1>>y1;
+             if(a[x1][y1] == 1){
+                 upd(x1,y1,-1);
+                 a[x1][y1]=0;
+             }
+             else {
+                 upd(x1,y1,1);
+                 a[x1][y1]=1;
+             }
+         }
+         else{
+             cin>>x1>>y1>>x2>>y2;
+             cout<<get(x2,y2)-get(x2,y1-1)-get(x1-1,y2)+get(x1-1,y1-1)<<"\n";
+         }
+     }
+}
+
